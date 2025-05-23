@@ -8,9 +8,8 @@ import (
 
 	"github.com/PDOK/betterstack-exporter/internal/betterstack"
 	"github.com/PDOK/betterstack-exporter/internal/metrics"
-	"github.com/go-co-op/gocron/v2"
-	"github.com/google/uuid"
 	"github.com/iancoleman/strcase"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/urfave/cli/v2"
 )
@@ -64,30 +63,15 @@ func main() {
 		}
 		client := betterstack.NewClient(config)
 		metricsUpdater := metrics.NewUpdater(client)
-		scheduler, err := gocron.NewScheduler()
-		if err != nil {
-			return err
-		}
-		_, err = scheduler.NewJob(
-			gocron.DurationJob(time.Second*time.Duration(c.Int(ScrapeIntervalFlag))), // default: check monitors every minute
-			gocron.NewTask(metricsUpdater.UpdatePromMetrics),
-			gocron.WithName("updating metrics"),
-			gocron.WithSingletonMode(gocron.LimitModeReschedule),
-			gocron.WithStartAt(gocron.WithStartImmediately()),
-			gocron.WithEventListeners(
-				gocron.AfterJobRunsWithError(func(jobID uuid.UUID, jobName string, err error) {
-					log.Printf("%s (%s) errored: %s", jobName, jobID, err.Error())
-				})))
-		if err != nil {
-			return err
-		}
-		scheduler.Start()
+		prometheus.MustRegister(metricsUpdater)
 
+		bindAddress := c.String(BindAddressFlag)
 		http.Handle("/metrics", promhttp.Handler())
 		server := &http.Server{
-			Addr:              c.String(BindAddressFlag),
+			Addr:              bindAddress,
 			ReadHeaderTimeout: 10 * time.Second,
 		}
+		log.Printf("listening on %s", bindAddress)
 		return server.ListenAndServe()
 	}
 

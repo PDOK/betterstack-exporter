@@ -1,9 +1,10 @@
 package metrics
 
 import (
+	"log"
+
 	"github.com/PDOK/betterstack-exporter/internal/betterstack"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 var (
@@ -19,39 +20,50 @@ var (
 
 type Updater struct {
 	client                   betterstack.Client
-	betterStackMonitorStatus *prometheus.GaugeVec
+	BetterStackMonitorStatus *prometheus.GaugeVec
 }
 
 func NewUpdater(client betterstack.Client) *Updater {
-	betterStackMonitorStatus := promauto.NewGaugeVec(
+	betterStackMonitorStatus := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "betterstack_monitor_status",
-			Help: "The current status of the check (0: down, 1: maintenance, 2: up, 3: paused, 4: pending, 5: validating)",
+			Namespace: "betterstack",
+			Name:      "monitor_status",
+			Help:      "The current status of the check (0: down, 1: maintenance, 2: up, 3: paused, 4: pending, 5: validating)",
 		},
 		[]string{
 			"id",
-			"pronouncable_name",
+			"pronounceable_name",
 			"url",
 		},
 	)
 	return &Updater{
 		client:                   client,
-		betterStackMonitorStatus: betterStackMonitorStatus,
+		BetterStackMonitorStatus: betterStackMonitorStatus,
 	}
 }
 
-func (u *Updater) UpdatePromMetrics() error {
+func (u *Updater) Describe(ch chan<- *prometheus.Desc) {
+	u.BetterStackMonitorStatus.Describe(ch)
+}
+
+func (u *Updater) Collect(ch chan<- prometheus.Metric) {
+	u.UpdatePromMetrics()
+	u.BetterStackMonitorStatus.Collect(ch)
+}
+
+func (u *Updater) UpdatePromMetrics() {
+	log.Println("start updating uptime metrics")
 	monitors, err := u.client.ListMonitors()
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 	for _, monitor := range monitors {
 		labels := map[string]string{
-			"id":                monitor.ID,
-			"pronouncable_name": monitor.PronounceableName,
-			"url":               monitor.URL,
+			"id":                 monitor.ID,
+			"pronounceable_name": monitor.PronounceableName,
+			"url":                monitor.URL,
 		}
-		u.betterStackMonitorStatus.With(labels).Set(statusCodes[monitor.Status])
+		u.BetterStackMonitorStatus.With(labels).Set(statusCodes[monitor.Status])
 	}
-	return nil
+	log.Println("finished updating uptime metrics")
 }
