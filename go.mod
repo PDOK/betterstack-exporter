@@ -2,12 +2,14 @@ module github.com/PDOK/betterstack-exporter
 
 go 1.24
 
-require github.com/urfave/cli/v2 v2.27.6
+require (
+	github.com/google/uuid v1.6.0
+	github.com/urfave/cli/v2 v2.27.6
+)
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
@@ -21,7 +23,6 @@ require (
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/go-co-op/gocron/v2 v2.16.2
-	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/iancoleman/strcase v0.3.0
 	github.com/prometheus/client_golang v1.22.0
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
