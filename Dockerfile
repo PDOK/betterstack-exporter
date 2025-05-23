@@ -11,14 +11,18 @@ COPY internal internal
 ARG TARGETOS=linux
 ARG TARGETARCH=amd64
 ENV CGO_ENABLED=1
-RUN go test -short ./...
-RUN go build -v -a -o /betterstack-exporter github.com/PDOK/betterstack-exporter/cmd
+RUN go test -short ./... && \
+    go build -v -a -o /betterstack-exporter github.com/PDOK/betterstack-exporter/cmd
 
 FROM docker.io/debian:bookworm-slim
 
 RUN set -eux && \
     apt-get update && \
-    apt-get install -y libcurl4 curl openssl ca-certificates && \
+    apt-get install -y --no-install-recommends \
+        libcurl4=* \
+        curl=* \
+        openssl=* \
+        ca-certificates=* && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp
