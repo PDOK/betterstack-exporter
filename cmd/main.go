@@ -15,10 +15,9 @@ import (
 )
 
 const (
-	APITokenFlag       = "api-token"
-	BindAddressFlag    = "bind-address"
-	ScrapeIntervalFlag = "scrape-interval"
-	PageSizeFlag       = "page-size"
+	APITokenFlag    = "api-token"
+	BindAddressFlag = "bind-address"
+	PageSizeFlag    = "page-size"
 )
 
 var (
@@ -40,12 +39,6 @@ var (
 			Usage:   "The number of monitors to request per page (max 250).",
 			Value:   50,
 			EnvVars: []string{strcase.ToScreamingSnake(PageSizeFlag)},
-		},
-		&cli.IntFlag{
-			Name:    ScrapeIntervalFlag,
-			Usage:   "The interval in seconds between scraping of monitor statuses.",
-			Value:   60,
-			EnvVars: []string{strcase.ToScreamingSnake(ScrapeIntervalFlag)},
 		},
 	}
 )
