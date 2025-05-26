@@ -1,6 +1,6 @@
 # Better Stack exporter
 
-[![Build](https://github.com/PDOK/betterstack-exporter/actions/workflows/build-and-publish-image.yml/badge.svg)](https://github.com/PDOK/betterstack-exporter/actions/workflows/build-and-publish-image.yml)
+[![Build](https://github.com/PDOK/betterstack-exporter/actions/workflows/build-and-publish-image.yaml/badge.svg)](https://github.com/PDOK/betterstack-exporter/actions/workflows/build-and-publish-image.yaml)
 [![Lint (go)](https://github.com/PDOK/betterstack-exporter/actions/workflows/lint-go.yml/badge.svg)](https://github.com/PDOK/betterstack-exporter/actions/workflows/lint-go.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/PDOK/betterstack-exporter)](https://goreportcard.com/report/github.com/PDOK/betterstack-exporter)
 [![Coverage (go)](https://github.com/PDOK/betterstack-exporter/wiki/coverage.svg)](https://raw.githack.com/wiki/PDOK/betterstack-exporter/coverage.html)
