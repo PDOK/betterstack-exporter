@@ -40,7 +40,7 @@ type MonitorListResponse struct {
 		ID         string `json:"id"`
 		Attributes *struct {
 			URL               string `json:"url"`
-			PronounceableName string `json:"pronounceable_name"`
+			PronounceableName string `json:"pronounceable_name"` //nolint:tagliatelle
 			Status            string `json:"status"`
 		} `json:"attributes"`
 	} `json:"data"`
@@ -63,6 +63,32 @@ func NewClient(config Config) Client {
 		config:     config,
 		httpClient: &http.Client{Timeout: time.Duration(5) * time.Minute},
 	}
+}
+
+func (c Client) ListMonitors() ([]Monitor, error) {
+	result := []Monitor{}
+	monitors, err := c.listMonitors()
+	if err != nil {
+		return []Monitor{}, err
+	}
+	for {
+		for _, monitor := range monitors.Data {
+			result = append(result, Monitor{
+				ID:                monitor.ID,
+				PronounceableName: monitor.Attributes.PronounceableName,
+				URL:               monitor.Attributes.URL,
+				Status:            monitor.Attributes.Status,
+			})
+		}
+		if !monitors.hasNext() {
+			break // exit infinite loop
+		}
+		monitors, err = monitors.next(c)
+		if err != nil {
+			return []Monitor{}, err
+		}
+	}
+	return result, nil
 }
 
 func (c Client) execRequest(req *http.Request, expectedStatus int) (*http.Response, error) {
@@ -103,32 +129,6 @@ func (c Client) listMonitors() (*MonitorListResponse, error) {
 		return nil, err
 	}
 	return &monitors, nil
-}
-
-func (c Client) ListMonitors() ([]Monitor, error) {
-	result := []Monitor{}
-	monitors, err := c.listMonitors()
-	if err != nil {
-		return []Monitor{}, err
-	}
-	for {
-		for _, monitor := range monitors.Data {
-			result = append(result, Monitor{
-				ID:                monitor.ID,
-				PronounceableName: monitor.Attributes.PronounceableName,
-				URL:               monitor.Attributes.URL,
-				Status:            monitor.Attributes.Status,
-			})
-		}
-		if !monitors.hasNext() {
-			break // exit infinite loop
-		}
-		monitors, err = monitors.next(c)
-		if err != nil {
-			return []Monitor{}, err
-		}
-	}
-	return result, nil
 }
 
 func (m MonitorListResponse) hasNext() bool {
