@@ -1,6 +1,6 @@
 module github.com/PDOK/betterstack-exporter
 
-go 1.24.2
+go 1.26.1
 
 require (
 	github.com/iancoleman/strcase v0.3.0
