@@ -57,6 +57,9 @@ func (u *Updater) UpdatePromMetrics() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	u.BetterStackMonitorStatus.Reset()
+
 	for _, monitor := range monitors {
 		labels := map[string]string{
 			"id":                 monitor.ID,
